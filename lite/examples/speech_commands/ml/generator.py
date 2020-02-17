@@ -71,8 +71,8 @@ def which_set(filename, validation_percentage, testing_percentage):
 
 def load_wav_file(filename):
   """Loads an audio file and returns a float PCM-encoded array of samples."""
-  with tf.Session(graph=tf.Graph()) as sess:
-    wav_filename_placeholder = tf.placeholder(tf.string, [])
+  with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+    wav_filename_placeholder = tf.compat.v1.placeholder(tf.string, [])
     wav_loader = io_ops.read_file(wav_filename_placeholder)
     wav_decoder = tf.audio.decode_wav(wav_loader, desired_channels=1)
     return sess.run(
@@ -83,10 +83,10 @@ def load_wav_file(filename):
 
 def save_wav_file(filename, wav_data, sample_rate):
   """Saves audio sample data to a .wav audio file."""
-  with tf.Session(graph=tf.Graph()) as sess:
-    wav_filename_placeholder = tf.placeholder(tf.string, [])
-    sample_rate_placeholder = tf.placeholder(tf.int32, [])
-    wav_data_placeholder = tf.placeholder(tf.float32, [None, 1])
+  with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+    wav_filename_placeholder = tf.compat.v1.placeholder(tf.string, [])
+    sample_rate_placeholder = tf.compat.v1.placeholder(tf.int32, [])
+    wav_data_placeholder = tf.compat.v1.placeholder(tf.float32, [None, 1])
     wav_encoder = tf.audio.encode_wav(wav_data_placeholder,
                                       sample_rate_placeholder)
     wav_saver = io_ops.write_file(wav_filename_placeholder, wav_encoder)
@@ -200,8 +200,8 @@ class AudioProcessor(object):
     background_dir = os.path.join(self.data_dirs[0], BACKGROUND_NOISE_DIR_NAME)
     if not os.path.exists(background_dir):
       return self.background_data
-    with tf.Session(graph=tf.Graph()) as sess:
-      wav_filename_placeholder = tf.placeholder(tf.string, [])
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+      wav_filename_placeholder = tf.compat.v1.placeholder(tf.string, [])
       wav_loader = io_ops.read_file(wav_filename_placeholder)
       wav_decoder = tf.audio.decode_wav(wav_loader, desired_channels=1)
       search_path = os.path.join(self.data_dirs[0], BACKGROUND_NOISE_DIR_NAME,
@@ -218,24 +218,24 @@ class AudioProcessor(object):
   def prepare_processing_graph(self, model_settings):
     """Builds a TensorFlow graph to apply the input distortions"""
     desired_samples = model_settings['desired_samples']
-    self.wav_filename_placeholder_ = tf.placeholder(
+    self.wav_filename_placeholder_ = tf.compat.v1.placeholder(
         tf.string, [], name='filename')
     wav_loader = io_ops.read_file(self.wav_filename_placeholder_)
     wav_decoder = tf.audio.decode_wav(
         wav_loader, desired_channels=1, desired_samples=desired_samples)
     # Allow the audio sample's volume to be adjusted.
-    self.foreground_volume_placeholder_ = tf.placeholder(
+    self.foreground_volume_placeholder_ = tf.compat.v1.placeholder(
         tf.float32, [], name='foreground_volme')
     scaled_foreground = tf.multiply(wav_decoder.audio,
                                     self.foreground_volume_placeholder_)
     # Shift the sample's start position, and pad any gaps with zeros.
-    self.time_shift_placeholder_ = tf.placeholder(tf.int32, name='timeshift')
+    self.time_shift_placeholder_ = tf.compat.v1.placeholder(tf.int32, name='timeshift')
     shifted_foreground = tf_roll(scaled_foreground,
                                  self.time_shift_placeholder_)
     # Mix in background noise.
-    self.background_data_placeholder_ = tf.placeholder(
+    self.background_data_placeholder_ = tf.compat.v1.placeholder(
         tf.float32, [desired_samples, 1], name='background_data')
-    self.background_volume_placeholder_ = tf.placeholder(
+    self.background_volume_placeholder_ = tf.compat.v1.placeholder(
         tf.float32, [], name='background_volume')
     background_mul = tf.multiply(self.background_data_placeholder_,
                                  self.background_volume_placeholder_)
@@ -262,7 +262,7 @@ class AudioProcessor(object):
                                     linear_to_mel_weight_matrix, 1)
     mel_spectrograms.set_shape(self.spectrogram_.shape[:-1].concatenate(
         linear_to_mel_weight_matrix.shape[-1:]))
-    log_mel_spectrograms = tf.log(mel_spectrograms + 1e-6)
+    log_mel_spectrograms = tf.math.log(mel_spectrograms + 1e-6)
     self.mfcc_ = tf.signal.mfccs_from_log_mel_spectrograms(
         log_mel_spectrograms)[:, :, :
                               model_settings['num_log_mel_features']]  # :13
@@ -404,12 +404,12 @@ class AudioProcessor(object):
     words_list = self.words_list
     data = np.zeros((sample_count, desired_samples))
     labels = []
-    with tf.Session(graph=tf.Graph()) as sess:
-      wav_filename_placeholder = tf.placeholder(tf.string, [], name='filename')
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+      wav_filename_placeholder = tf.compat.v1.placeholder(tf.string, [], name='filename')
       wav_loader = io_ops.read_file(wav_filename_placeholder)
       wav_decoder = tf.audio.decode_wav(
           wav_loader, desired_channels=1, desired_samples=desired_samples)
-      foreground_volume_placeholder = tf.placeholder(
+      foreground_volume_placeholder = tf.compat.v1.placeholder(
           tf.float32, [], name='foreground_volume')
       scaled_foreground = tf.multiply(wav_decoder.audio,
                                       foreground_volume_placeholder)

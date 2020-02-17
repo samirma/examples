@@ -19,7 +19,7 @@ from __future__ import print_function
 
 import numpy as np
 from pandas_ml import ConfusionMatrix
-from keras.callbacks import Callback
+from tensorflow.keras.callbacks import Callback
 
 
 def log_loss(y_true, y_pred, eps=1e-12):

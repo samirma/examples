@@ -21,9 +21,8 @@ import argparse
 import os
 
 import tensorflow as tf
-from keras import backend as K
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import TensorBoard
 from callbacks import ConfusionMatrixCallback
 from model import speech_model, prepare_model_settings
 from generator import AudioProcessor, prepare_words_list
@@ -66,9 +65,6 @@ parser.print_help()
 print('input args: ', args)
 
 if __name__ == '__main__':
-  gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=1.0)
-  sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-  K.set_session(sess)
   data_dirs = args.data_dirs
   output_representation = args.output_representation
   sample_rate = args.sample_rate

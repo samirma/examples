@@ -17,10 +17,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import keras
-from keras.layers import *
-from keras.regularizers import l2
-from keras.models import Model
+#import keras
+from tensorflow.keras.layers import *
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.models import Model
 
 
 def preprocess(x):
